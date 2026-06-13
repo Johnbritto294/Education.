@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 40" width="160" height="36">
+  <defs>
+    <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00FF9D"/>
+      <stop offset="100%" stop-color="#00CC7D"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="40" height="40" rx="10" fill="url(#sg)"/>
+  <path d="M12 14 L20 10 L28 14 L20 18Z" fill="#121212"/>
+  <path d="M12 26 L20 22 L28 26 L20 30Z" fill="#121212" opacity="0.6"/>
+  <text x="48" y="28" font-family="'Sora',sans-serif" font-size="22" font-weight="800" fill="#ffffff" letter-spacing="-0.5">Stackly</text>
+</svg>
