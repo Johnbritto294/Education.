@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Login - Stackly</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+
+<style>
+
+.nav-logo img{height:40px;width:auto;display:block;filter:url(#logo-recolor);transition:filter .3s}
+
+.nav-logo:hover img{filter:url(#logo-recolor) drop-shadow(0 0 12px rgba(212,175,55,.9))}
+
+
+
+  :root{--primary:#D4AF37;--primary-dark:#B59410;--dark:#0A192F;--dark2:#0F223D;--border:#333;--text:#E0E0E0;--muted:#9E9E9E}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html,body{height:100%}
+  body{font-family:'Inter',sans-serif;background:#141414;color:var(--text);margin:0}
+  .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:28px}
+  .login-split{display:flex;width:100%;max-width:1100px;background:#141414;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .login-visual{width:45%;position:relative;background:url('images/login-hero.webp') center/cover no-repeat;display:flex;align-items:flex-end;padding:40px}
+  .login-visual::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.75))}
+  .login-visual-text{position:relative;z-index:1;color:#fff}
+  .login-visual-text h2{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;line-height:1.2;margin-bottom:10px;letter-spacing:-1px}
+  .login-visual-text p{font-size:15px;opacity:.85;line-height:1.5}
+  .login-card{width:55%;max-width:520px;background:#141414;border:none;border-radius:16px;padding:36px;box-shadow:none}
+
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+
+  .brand img{height:44px;width:auto;display:block;filter:url(#logo-recolor)}
+
+  .brand-name{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:.2px}
+
+  .login-card h1{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px}
+
+  .login-card p.sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+
+  label{display:block;font-size:13px;font-weight:600;color:#d6d6d6;margin-bottom:6px}
+
+  input[type=text],input[type=email],input[type=password]{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:#111;color:#fff;outline:none;transition:.2s}
+
+  input:focus,select:focus{border-color:#0A192F;box-shadow:0 0 0 3px rgba(212,175,55,.12)}
+
+  .field{margin-bottom:14px}
+
+  .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:13px;color:#cfcfcf}
+
+  .row a{color:var(--primary);text-decoration:none;font-weight:600;transition:.2s}
+
+  .row a:hover{color:var(--primary-dark);text-decoration:underline}
+
+  .primary{width:100%;padding:13px;border:none;border-radius:10px;background:var(--primary);color:#000;font-weight:700;cursor:pointer;transition:.2s}
+
+  .primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+
+  .divider{height:1px;background:#222;margin:18px 0}
+
+  .alt{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:#e8e8e8;font-weight:600;cursor:pointer;transition:.2s}
+
+  .alt:hover{border-color:#555;background:#111}
+
+  .footer{margin-top:18px;text-align:center;font-size:13px;color:#bbb}
+
+  .footer a{color:#fff;text-decoration:none;font-weight:700}
+
+  .gsap-init{opacity:0;transform:translateY(24px);filter:blur(6px);will-change:transform,opacity,filter}
+
+  .back-btn:hover{color:var(--primary) !important}
+
+  @media(max-width:768px){
+    .login-split{flex-direction:column;max-width:460px}
+    .login-visual{display:none}
+    .login-card{width:100%;max-width:100%}
+  }
+
+  .email-error{color:#ff4d4d;font-size:12px;margin-top:6px;display:none}
+  .pass-error{color:#ff4d4d;font-size:12px;margin-top:6px;display:none}
+
+</style>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;display:none">
+
+
+  <filter id="logo-recolor" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0 0.831"/>
+        <feFuncG type="table" tableValues="0 0.686"/>
+        <feFuncB type="table" tableValues="0 0.216"/>
+      </feComponentTransfer>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+    </filter>
+
+
+  <title>Hidden SVG filters</title>
+
+
+</svg>
+
+
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="login-split">
+
+    <div class="login-visual">
+
+      <div class="login-visual-text">
+        <h2>Learn Without Limits</h2>
+        <p>Join 50,000+ students mastering new skills every day.</p>
+      </div>
+
+    </div>
+
+    <div class="login-card">
+
+    <a href="index.html" class="back-btn gsap-init" style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;margin-bottom:16px;transition:.2s;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back
+    </a>
+
+    <div class="brand gsap-init" style="justify-content:center;">
+
+      <a href="index.html"><img src="logo.png" alt="Stackly"/></a>
+
+    </div>
+
+    <h1 class="gsap-init">Welcome back</h1>
+
+    <p class="sub gsap-init">Log in to continue learning.</p>
+
+    <form onsubmit="event.preventDefault();
+      var e=document.getElementById('email').value;
+      var re=/^[^\s@]+@[^\s@]+\.com$/i;
+      var err=document.getElementById('emailError');
+      if(!re.test(e)){err.style.display='block';err.textContent='Please enter a valid .com email address.';return;}
+      err.style.display='none';
+      var p=document.getElementById('password').value;
+      var perr=document.getElementById('passError');
+      if(p.length<6){perr.style.display='block';return;}
+      perr.style.display='none';
+      var encoded=encodeURIComponent(e);
+      var role=encodeURIComponent(document.getElementById('roleSelect').value||'student');
+      window.location.href='dashboard.html?email='+encoded+'&role='+role;">
+
+      <div class="field gsap-init">
+
+        <label for="roleSelect">Select Role</label>
+
+        <select id="roleSelect" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:#111;color:#fff;outline:none;transition:.2s;font-size:14px;font-family:'Inter',sans-serif;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill=&quot;%23999&quot; viewBox=&quot;0 0 24 24&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;><path d=&quot;M7 10l5 5 5-5z&quot;/></svg>');background-repeat:no-repeat;background-position:right 12px center;background-size:20px;">
+          <option value="" disabled selected>Choose your role...</option>
+          <option value="student">Student</option>
+          <option value="authenticator">Authenticator</option>
+        </select>
+
+      </div>
+
+      <div class="field gsap-init">
+
+        <label for="email">Email</label>
+
+        <input id="email" type="text" placeholder="you@example.com" autocomplete="email"
+          oninput="
+            var re=/^[^\s@]+@[^\s@]+\.com$/i;
+            var err=document.getElementById('emailError');
+            if(this.value && !re.test(this.value)){err.style.display='block';}
+            else{err.style.display='none';}
+          "/>
+        <div class="email-error" id="emailError">Please enter a valid .com email address.</div>
+
+      </div>
+
+      <div class="field gsap-init">
+
+        <label for="password">Password</label>
+
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" minlength="6"/>
+        <div class="pass-error" id="passError">Password must be at least 6 characters.</div>
+
+      </div>
+
+      <div class="row gsap-init">
+
+        <label style="display:inline-flex;align-items:center;gap:8px;font-weight:500"><input type="checkbox"/> Remember me</label>
+
+        <a href="404.html">Forgot password?</a>
+
+      </div>
+
+      <button class="primary gsap-init" type="submit">Log In</button>
+
+    </form>
+
+    <div class="divider gsap-init"></div>
+
+    <button class="alt gsap-init" type="button" onclick="location.href='404.html'">Continue with Google</button>
+
+    <div class="footer gsap-init">Don't have an account? <a href="signup.html">Create account</a></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+
+  window.addEventListener('load', function(){
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    document.querySelectorAll('.gsap-init').forEach(function(el, i){
+
+      gsap.fromTo(el,
+
+        { y: 28, opacity: 0, filter: 'blur(8px)' },
+
+        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.85, ease: 'power3.out', delay: i * 0.08 }
+
+      );
+
+    });
+
+  });
+
+</script>
+
+</body>
+
+</html>

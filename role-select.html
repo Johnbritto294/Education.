@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Choose Your Role - Stackly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--primary:#D4AF37;--primary-dark:#B59410;--dark:#0A192F;--dark2:#0F223D;--border:#333;--text:#E0E0E0;--muted:#9E9E9E}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#0A192F,#0a0a0a);color:var(--text)}
+
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:28px}
+    .login-card{width:100%;max-width:860px;background:#141414;border:1px solid var(--border);border-radius:16px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .brand img{height:44px;width:auto;display:block;filter:url(#logo-recolor)}
+    .brand-name{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:.2px}
+
+    h1{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px}
+    p.sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+
+    .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px}
+    .role{display:flex;flex-direction:column;gap:10px;padding:22px;border-radius:14px;border:1px solid var(--border);background:#0F223D;text-decoration:none;color:var(--text);transition:.25s}
+    .role:hover{border-color:#0A192F;background:#141414;transform:translateY(-4px);box-shadow:0 12px 40px rgba(212,175,55,.12)}
+    .icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#B59410);display:flex;align-items:center;justify-content:center;font-size:22px;color:#0A192F;font-weight:800}
+    .role-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#fff}
+    .role-desc{font-size:13px;color:var(--muted);line-height:1.5}
+    .arrow{margin-top:auto;font-size:13px;color:#0A192F;font-weight:600}
+
+    @media(max-width:768px){
+      .roles{grid-template-columns:1fr}
+    }
+  </style>
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;display:none">
+    <filter id="logo-recolor" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0 0.831"/>
+        <feFuncG type="table" tableValues="0 0.686"/>
+        <feFuncB type="table" tableValues="0 0.216"/>
+      </feComponentTransfer>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+    </filter>
+    <title>Hidden SVG filters</title>
+  </svg>
+</head>
+<body>
+  <div class="wrap">
+    <div class="login-card">
+      <div class="brand">
+        <a href="index.html"><img src="logo.png" alt="Stackly"/></a>
+        <div class="brand-name">Stackly</div>
+      </div>
+      <h1>Choose Your Role</h1>
+      <p class="sub">Select how you want to access Stackly.</p>
+      <div class="roles">
+        <a class="role" href="student-login.html">
+          <div class="icon">S</div>
+          <div class="role-title">Student</div>
+          <div class="role-desc">Enroll in courses, track progress, and earn certificates.</div>
+          <div class="arrow">Student Login →</div>
+        </a>
+        <a class="role" href="auth-login.html">
+          <div class="icon">A</div>
+          <div class="role-title">Authenticator</div>
+          <div class="role-desc">Verify learner identity and manage approvals.</div>
+          <div class="arrow">Authenticator Login →</div>
+        </a>
+        <a class="role" href="admin-login.html">
+          <div class="icon">M</div>
+          <div class="role-title">Admin</div>
+          <div class="role-desc">Manage platform settings, courses, and users.</div>
+          <div class="arrow">Admin Login →</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

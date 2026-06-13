@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Progress - Stackly</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--primary:#D4AF37;--primary-dark:#B59410;--primary-glow:rgba(212,175,55,.15);--dark:#0a0a0a;--dark2:#020C1B;--dark3:#0F223D;--dark4:#222;--border:#2a2a2a;--text:#E0E0E0;--muted:#9E9E9E;--purple:#6C63FF;--red:#FF6B6B;--orange:#FFA726;--cyan:#00BCD4;--radius:14px;--transition:all .3s cubic-bezier(.4,0,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden}
+
+/* ── Sidebar ── */
+.sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:linear-gradient(180deg,#111 0%,#0d0d0d 100%);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;z-index:100;transition:var(--transition)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:0 8px 28px;border-bottom:1px solid var(--border)}
+.sidebar-brand img{height:36px;filter:brightness(0) saturate(100%) invert(82%) sepia(94%) saturate(743%) hue-rotate(10deg) brightness(103%) contrast(101%)}
+.sidebar-brand span{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#fff}
+.nav-section{margin-top:24px;flex:1}
+.nav-label{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:1.2px;padding:0 12px;margin-bottom:10px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:var(--transition);margin-bottom:2px;position:relative}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--primary);background:var(--primary-glow);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--primary);border-radius:0 4px 4px 0}
+.nav-item svg{width:20px;height:20px;flex-shrink:0}
+.sidebar-footer{border-top:1px solid var(--border);padding-top:16px}
+.user-card{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;transition:var(--transition);cursor:pointer}
+.user-card:hover{background:rgba(255,255,255,.04)}
+.user-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#B59410);display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:15px;flex-shrink:0}
+.user-info{min-width:0}
+.user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--muted)}
+.logout-btn{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:#FF6B6B;text-decoration:none;font-size:14px;font-weight:500;transition:var(--transition);margin-top:8px;border:none;background:none;cursor:pointer;width:100%}
+.logout-btn:hover{background:rgba(255,107,107,.08);color:#ff4444}
+
+/* ── Main Content ── */
+.main{margin-left:260px;min-height:100vh;padding:28px 32px 40px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.topbar h1{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:#fff}
+.topbar p{color:var(--muted);font-size:14px;margin-top:4px}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);position:relative}
+.icon-btn:hover{border-color:#444;color:#fff;background:var(--dark4)}
+  .icon-btn .badge{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--primary)}
+  .user-email-display{display:flex;align-items:center;gap:10px;background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:8px 14px;color:var(--muted);font-size:13px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .user-email-display svg{color:#555;width:18px;height:18px;flex-shrink:0}
+  .user-email-display span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .user-role-display{display:flex;align-items:center}
+  .role-badge{background:rgba(212,175,55,.12);color:var(--primary);font-size:12px;font-weight:700;padding:6px 12px;border-radius:99px;border:1px solid rgba(212,175,55,.25);white-space:nowrap;text-transform:capitalize}
+
+/* ── Section Title ── */
+.section-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.section-title span{display:flex;align-items:center;gap:8px}
+
+/* ── Stats Grid ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:32px}
+.stat-card{background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:var(--transition);position:relative;overflow:hidden}
+.stat-card:hover{border-color:#444;transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:100px;height:100px;border-radius:50%;filter:blur(50px);opacity:.15;pointer-events:none}
+.stat-card:nth-child(1)::after{background:#D4AF37}
+.stat-card:nth-child(2)::after{background:#6C63FF}
+.stat-card:nth-child(3)::after{background:#FF6B6B}
+.stat-card:nth-child(4)::after{background:#FFA726}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:22px}
+.stat-card:nth-child(1) .stat-icon{background:rgba(212,175,55,.12);color:#D4AF37}
+.stat-card:nth-child(2) .stat-icon{background:rgba(108,99,255,.12);color:#6C63FF}
+.stat-card:nth-child(3) .stat-icon{background:rgba(255,107,107,.12);color:#FF6B6B}
+.stat-card:nth-child(4) .stat-icon{background:rgba(255,167,38,.12);color:#FFA726}
+.stat-number{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1}
+.stat-label{font-size:13px;color:var(--muted);margin-top:6px}
+.stat-change{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;margin-top:10px;padding:3px 8px;border-radius:6px}
+.stat-change.up{color:#D4AF37;background:rgba(212,175,55,.1)}
+
+/* ── Panel Card ── */
+.panel-card{background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px;transition:var(--transition)}
+.panel-card:hover{border-color:#333}
+
+/* ── Two Column Layout ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+
+/* ── Learning Streak ── */
+.streak-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.streak-header .streak-count{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--primary)}
+.streak-header .streak-count span{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+.streak-grid{display:flex;flex-direction:column;gap:6px}
+.streak-row{display:flex;align-items:center;gap:6px}
+.streak-row-label{width:36px;font-size:11px;color:#555;text-align:right;flex-shrink:0}
+.streak-cell{width:32px;height:32px;border-radius:6px;background:#1f1f1f;border:1px solid var(--border);transition:var(--transition);position:relative;cursor:pointer}
+.streak-cell:hover{border-color:#444;transform:scale(1.15);z-index:2}
+.streak-cell.level-1{background:rgba(212,175,55,.15);border-color:rgba(212,175,55,.2)}
+.streak-cell.level-2{background:rgba(212,175,55,.35);border-color:rgba(212,175,55,.4)}
+.streak-cell.level-3{background:rgba(212,175,55,.55);border-color:rgba(212,175,55,.5)}
+.streak-cell.level-4{background:#D4AF37;border-color:#D4AF37;box-shadow:0 0 12px rgba(212,175,55,.3)}
+.streak-cell.today{outline:2px solid var(--primary);outline-offset:2px}
+.streak-day-labels{display:flex;gap:6px;margin-left:42px;margin-top:8px}
+.streak-day-labels span{width:32px;font-size:10px;color:#555;text-align:center}
+.streak-legend{display:flex;align-items:center;gap:8px;margin-top:14px;justify-content:flex-end}
+.streak-legend span{font-size:11px;color:#555}
+.streak-legend-cell{width:14px;height:14px;border-radius:3px}
+
+/* ── Course Progress ── */
+.course-progress-item{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)}
+.course-progress-item:last-child{border-bottom:none}
+.course-progress-thumb{width:42px;height:42px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--dark4)}
+.course-progress-thumb img{width:100%;height:100%;object-fit:cover}
+.course-progress-info{flex:1;min-width:0}
+.course-progress-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.course-progress-bar-wrap{display:flex;align-items:center;gap:12px}
+.course-progress-bar{flex:1;height:8px;background:var(--dark4);border-radius:8px;overflow:hidden}
+.course-progress-fill{height:100%;border-radius:8px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.course-progress-pct{font-size:13px;font-weight:700;width:42px;text-align:right;flex-shrink:0}
+
+/* ── Skills Breakdown ── */
+.skill-item{margin-bottom:18px}
+.skill-item:last-child{margin-bottom:0}
+.skill-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.skill-name{font-size:13px;font-weight:600;color:#fff}
+.skill-pct{font-size:13px;font-weight:700}
+.skill-bar{width:100%;height:10px;background:var(--dark4);border-radius:8px;overflow:hidden;position:relative}
+.skill-fill{height:100%;border-radius:8px;transition:width 1.5s cubic-bezier(.4,0,.2,1);position:relative}
+.skill-fill::after{content:'';position:absolute;top:0;right:0;width:20px;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2));border-radius:0 8px 8px 0}
+
+/* ── Achievements ── */
+.achievements-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.badge-card{background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius);padding:24px 16px;text-align:center;transition:var(--transition);cursor:pointer;position:relative;overflow:hidden}
+.badge-card:hover{border-color:#444;transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.badge-card::before{content:'';position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:80px;height:80px;border-radius:50%;filter:blur(40px);opacity:.12;pointer-events:none}
+.badge-card:nth-child(1)::before{background:#D4AF37}
+.badge-card:nth-child(2)::before{background:#FFA726}
+.badge-card:nth-child(3)::before{background:#6C63FF}
+.badge-card:nth-child(4)::before{background:#FF6B6B}
+.badge-emoji{font-size:42px;margin-bottom:12px;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3))}
+.badge-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
+.badge-date{font-size:11px;color:var(--muted)}
+.badge-glow{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:60%;height:3px;border-radius:4px}
+.badge-card:nth-child(1) .badge-glow{background:linear-gradient(90deg,transparent,#D4AF37,transparent)}
+.badge-card:nth-child(2) .badge-glow{background:linear-gradient(90deg,transparent,#FFA726,transparent)}
+.badge-card:nth-child(3) .badge-glow{background:linear-gradient(90deg,transparent,#6C63FF,transparent)}
+.badge-card:nth-child(4) .badge-glow{background:linear-gradient(90deg,transparent,#FF6B6B,transparent)}
+
+/* ── Time Chart ── */
+.time-chart{display:flex;align-items:flex-end;gap:12px;height:180px;padding:0 8px}
+.time-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%}
+.time-bar-track{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.time-bar{width:100%;max-width:44px;border-radius:8px 8px 4px 4px;transition:height 1.5s cubic-bezier(.4,0,.2,1);position:relative;cursor:pointer;min-width:24px}
+.time-bar:hover{filter:brightness(1.2);transform:scaleX(1.08)}
+.time-bar::after{content:attr(data-hours);position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:#fff;opacity:0;transition:opacity .2s}
+.time-bar:hover::after{opacity:1}
+.time-day{font-size:12px;color:var(--muted);font-weight:500}
+.time-hours{font-size:11px;color:#555;margin-top:4px}
+.chart-y-axis{display:flex;flex-direction:column;justify-content:space-between;height:100%;padding-right:12px}
+.chart-y-label{font-size:10px;color:#444;text-align:right;width:24px}
+
+/* ── Animations ── */
+.gsap-init{opacity:0;transform:translateY(20px)}
+
+/* ── Responsive ── */
+@media(max-width:1200px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr}
+  .achievements-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0}
+  .stats-grid{grid-template-columns:1fr}
+  .achievements-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand"><a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;"><img src="logo.png" alt="Stackly"/></a></div>
+  <nav class="nav-section">
+    <div class="nav-label">Main</div>
+    <a href="dashboard.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Dashboard
+    </a>
+    <a href="my-courses.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      My Courses
+    </a>
+    <a href="schedule.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Schedule
+    </a>
+    <a href="progress.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Progress
+    </a>
+    
+    
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">JS</div>
+      <div class="user-info">
+        <div class="user-name">Jason Student</div>
+        <div class="user-role">Student</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='login.html'">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out
+    </button>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- Top Bar -->
+  <div class="topbar gsap-init">
+    <div>
+      <h1>📊 My Progress</h1>
+      <p>Track your learning journey and achievements</p>
+    </div>
+    <div class="topbar-right">
+      <div class="user-email-display">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="userEmailText">user@example.com</span>
+      </div>
+      <div class="user-role-display">
+        <span id="userRoleText" class="role-badge">Student</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall Stats -->
+  <div class="stats-grid">
+    <div class="stat-card gsap-init">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <div class="stat-number" data-count="12">0</div>
+      <div class="stat-label">Total Courses</div>
+      <div class="stat-change up">↑ 3 this month</div>
+    </div>
+    <div class="stat-card gsap-init">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="stat-number" data-count="7">0</div>
+      <div class="stat-label">Completed</div>
+      <div class="stat-change up">↑ 2 this month</div>
+    </div>
+    <div class="stat-card gsap-init">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="stat-number" data-count="5">0</div>
+      <div class="stat-label">In Progress</div>
+      <div class="stat-change up">↑ 1 new</div>
+    </div>
+    <div class="stat-card gsap-init">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div class="stat-number" data-count="87" data-suffix="%">0</div>
+      <div class="stat-label">Average Score</div>
+      <div class="stat-change up">↑ 4% improvement</div>
+    </div>
+  </div>
+
+  <!-- Learning Streak + Skills Breakdown -->
+  <div class="two-col">
+
+    <!-- Learning Streak -->
+    <div class="panel-card gsap-init">
+      <div class="section-title" style="margin-bottom:4px"><span>🔥 Learning Streak</span></div>
+      <div class="streak-header">
+        <div class="streak-count">14<span>day streak</span></div>
+        <div style="font-size:12px;color:var(--muted)">Last 4 weeks</div>
+      </div>
+      <div class="streak-grid">
+        <!-- Week 1 (4 weeks ago) -->
+        <div class="streak-row">
+          <div class="streak-row-label">W1</div>
+          <div class="streak-cell level-2" title="Mon - 1.5h"></div>
+          <div class="streak-cell level-1" title="Tue - 0.5h"></div>
+          <div class="streak-cell level-3" title="Wed - 2.5h"></div>
+          <div class="streak-cell" title="Thu - 0h"></div>
+          <div class="streak-cell level-1" title="Fri - 0.5h"></div>
+          <div class="streak-cell" title="Sat - 0h"></div>
+          <div class="streak-cell level-2" title="Sun - 1h"></div>
+        </div>
+        <!-- Week 2 -->
+        <div class="streak-row">
+          <div class="streak-row-label">W2</div>
+          <div class="streak-cell level-3" title="Mon - 3h"></div>
+          <div class="streak-cell level-4" title="Tue - 4h"></div>
+          <div class="streak-cell level-2" title="Wed - 1.5h"></div>
+          <div class="streak-cell level-1" title="Thu - 0.5h"></div>
+          <div class="streak-cell" title="Fri - 0h"></div>
+          <div class="streak-cell level-2" title="Sat - 1.5h"></div>
+          <div class="streak-cell level-3" title="Sun - 2h"></div>
+        </div>
+        <!-- Week 3 -->
+        <div class="streak-row">
+          <div class="streak-row-label">W3</div>
+          <div class="streak-cell level-4" title="Mon - 4.5h"></div>
+          <div class="streak-cell level-3" title="Tue - 2.5h"></div>
+          <div class="streak-cell level-2" title="Wed - 1h"></div>
+          <div class="streak-cell level-4" title="Thu - 5h"></div>
+          <div class="streak-cell level-3" title="Fri - 2h"></div>
+          <div class="streak-cell level-1" title="Sat - 0.5h"></div>
+          <div class="streak-cell level-2" title="Sun - 1.5h"></div>
+        </div>
+        <!-- Week 4 (current) -->
+        <div class="streak-row">
+          <div class="streak-row-label">W4</div>
+          <div class="streak-cell level-3" title="Mon - 2.5h"></div>
+          <div class="streak-cell level-4" title="Tue - 4h"></div>
+          <div class="streak-cell level-2" title="Wed - 1h"></div>
+          <div class="streak-cell level-3 today" title="Thu - 3h (Today)"></div>
+          <div class="streak-cell" title="Fri"></div>
+          <div class="streak-cell" title="Sat"></div>
+          <div class="streak-cell" title="Sun"></div>
+        </div>
+      </div>
+      <div class="streak-day-labels">
+        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+      </div>
+      <div class="streak-legend">
+        <span>Less</span>
+        <div class="streak-legend-cell" style="background:#1f1f1f;border:1px solid var(--border)"></div>
+        <div class="streak-legend-cell" style="background:rgba(212,175,55,.15)"></div>
+        <div class="streak-legend-cell" style="background:rgba(212,175,55,.35)"></div>
+        <div class="streak-legend-cell" style="background:rgba(212,175,55,.55)"></div>
+        <div class="streak-legend-cell" style="background:#D4AF37"></div>
+        <span>More</span>
+      </div>
+    </div>
+
+    <!-- Skills Breakdown -->
+    <div class="panel-card gsap-init">
+      <div class="section-title"><span>🎯 Skills Breakdown</span></div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <div class="skill-name">💻 Development</div>
+          <div class="skill-pct" style="color:#D4AF37">85%</div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="width:0%;background:linear-gradient(90deg,#B59410,#D4AF37)" data-width="85"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <div class="skill-name">🎨 Design</div>
+          <div class="skill-pct" style="color:#FF6B6B">60%</div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="width:0%;background:linear-gradient(90deg,#E55555,#FF6B6B)" data-width="60"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <div class="skill-name">📢 Marketing</div>
+          <div class="skill-pct" style="color:#FFA726">72%</div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="width:0%;background:linear-gradient(90deg,#E69100,#FFA726)" data-width="72"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <div class="skill-name">🧠 Data Science</div>
+          <div class="skill-pct" style="color:#6C63FF">45%</div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="width:0%;background:linear-gradient(90deg,#5A52E0,#6C63FF)" data-width="45"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <div class="skill-name">💰 Finance</div>
+          <div class="skill-pct" style="color:#00BCD4">88%</div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="width:0%;background:linear-gradient(90deg,#0097A7,#00BCD4)" data-width="88"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Course-wise Progress -->
+  <div class="panel-card gsap-init">
+    <div class="section-title"><span>📚 Course Progress</span><a href="my-courses.html" style="font-size:13px;font-weight:500;color:var(--primary);text-decoration:none">View All →</a></div>
+    <div class="course-progress-item">
+      <div class="course-progress-thumb"><img src="images/mern_stack_course.webp" alt="MERN Stack"/></div>
+      <div class="course-progress-info">
+        <div class="course-progress-name">MERN Stack Web Development</div>
+        <div class="course-progress-bar-wrap">
+          <div class="course-progress-bar"><div class="course-progress-fill" style="width:0%;background:linear-gradient(90deg,#B59410,#D4AF37)" data-width="72"></div></div>
+          <div class="course-progress-pct" style="color:#D4AF37">72%</div>
+        </div>
+      </div>
+    </div>
+    <div class="course-progress-item">
+      <div class="course-progress-thumb"><img src="images/machine_learning_course.webp" alt="ML Python"/></div>
+      <div class="course-progress-info">
+        <div class="course-progress-name">Machine Learning with Python</div>
+        <div class="course-progress-bar-wrap">
+          <div class="course-progress-bar"><div class="course-progress-fill" style="width:0%;background:linear-gradient(90deg,#5A52E0,#6C63FF)" data-width="45"></div></div>
+          <div class="course-progress-pct" style="color:#6C63FF">45%</div>
+        </div>
+      </div>
+    </div>
+    <div class="course-progress-item">
+      <div class="course-progress-thumb"><img src="images/photoshop_course.webp" alt="Photoshop"/></div>
+      <div class="course-progress-info">
+        <div class="course-progress-name">Photoshop Graphic Design Mastery</div>
+        <div class="course-progress-bar-wrap">
+          <div class="course-progress-bar"><div class="course-progress-fill" style="width:0%;background:linear-gradient(90deg,#E55555,#FF6B6B)" data-width="28"></div></div>
+          <div class="course-progress-pct" style="color:#FF6B6B">28%</div>
+        </div>
+      </div>
+    </div>
+    <div class="course-progress-item">
+      <div class="course-progress-thumb"><img src="images/marketing_course.webp" alt="Marketing"/></div>
+      <div class="course-progress-info">
+        <div class="course-progress-name">Digital Brand Marketing Strategy</div>
+        <div class="course-progress-bar-wrap">
+          <div class="course-progress-bar"><div class="course-progress-fill" style="width:0%;background:linear-gradient(90deg,#E69100,#FFA726)" data-width="60"></div></div>
+          <div class="course-progress-pct" style="color:#FFA726">60%</div>
+        </div>
+      </div>
+    </div>
+    <div class="course-progress-item">
+      <div class="course-progress-thumb"><img src="images/finance_course.webp" alt="Finance"/></div>
+      <div class="course-progress-info">
+        <div class="course-progress-name">Business & Personal Finance</div>
+        <div class="course-progress-bar-wrap">
+          <div class="course-progress-bar"><div class="course-progress-fill" style="width:0%;background:linear-gradient(90deg,#0097A7,#00BCD4)" data-width="88"></div></div>
+          <div class="course-progress-pct" style="color:#00BCD4">88%</div>
+        </div>
+      </div>
+    </div>
+    <div class="course-progress-item">
+      <div class="course-progress-thumb"><img src="images/operations_course.webp" alt="Operations"/></div>
+      <div class="course-progress-info">
+        <div class="course-progress-name">Business Operations Management</div>
+        <div class="course-progress-bar-wrap">
+          <div class="course-progress-bar"><div class="course-progress-fill" style="width:0%;background:linear-gradient(90deg,#E040FB,#CE93D8)" data-width="55"></div></div>
+          <div class="course-progress-pct" style="color:#CE93D8">55%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="gsap-init" style="margin-bottom:24px">
+    <div class="section-title"><span>🏆 Recent Achievements</span></div>
+    <div class="achievements-grid">
+      <div class="badge-card gsap-init">
+        <span class="badge-emoji">🎓</span>
+        <div class="badge-title">First Course</div>
+        <div class="badge-date">Earned Jan 15, 2026</div>
+        <div class="badge-glow"></div>
+      </div>
+      <div class="badge-card gsap-init">
+        <span class="badge-emoji">🔥</span>
+        <div class="badge-title">7-Day Streak</div>
+        <div class="badge-date">Earned Mar 22, 2026</div>
+        <div class="badge-glow"></div>
+      </div>
+      <div class="badge-card gsap-init">
+        <span class="badge-emoji">🧠</span>
+        <div class="badge-title">Quiz Master</div>
+        <div class="badge-date">Earned May 10, 2026</div>
+        <div class="badge-glow"></div>
+      </div>
+      <div class="badge-card gsap-init">
+        <span class="badge-emoji">⚡</span>
+        <div class="badge-title">Fast Learner</div>
+        <div class="badge-date">Earned Jun 5, 2026</div>
+        <div class="badge-glow"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time Spent Chart -->
+  <div class="panel-card gsap-init">
+    <div class="section-title"><span>⏱️ Time Spent This Week</span><span style="font-size:13px;font-weight:500;color:var(--muted)">Total: 18.5 hrs</span></div>
+    <div style="display:flex">
+      <div class="chart-y-axis">
+        <div class="chart-y-label">5h</div>
+        <div class="chart-y-label">4h</div>
+        <div class="chart-y-label">3h</div>
+        <div class="chart-y-label">2h</div>
+        <div class="chart-y-label">1h</div>
+        <div class="chart-y-label">0</div>
+      </div>
+      <div class="time-chart" style="flex:1">
+        <div class="time-bar-wrap">
+          <div class="time-bar-track">
+            <div class="time-bar" data-hours="2.5h" style="height:0%;background:linear-gradient(180deg,#D4AF37,#B59410)" data-height="50"></div>
+          </div>
+          <div class="time-day">Fri</div>
+        </div>
+        <div class="time-bar-wrap">
+          <div class="time-bar-track">
+            <div class="time-bar" data-hours="3.5h" style="height:0%;background:linear-gradient(180deg,#6C63FF,#5A52E0)" data-height="70"></div>
+          </div>
+          <div class="time-day">Sat</div>
+        </div>
+        <div class="time-bar-wrap">
+          <div class="time-bar-track">
+            <div class="time-bar" data-hours="1.5h" style="height:0%;background:linear-gradient(180deg,#FF6B6B,#E55555)" data-height="30"></div>
+          </div>
+          <div class="time-day">Sun</div>
+        </div>
+        <div class="time-bar-wrap">
+          <div class="time-bar-track">
+            <div class="time-bar" data-hours="4h" style="height:0%;background:linear-gradient(180deg,#FFA726,#E69100)" data-height="80"></div>
+          </div>
+          <div class="time-day">Mon</div>
+        </div>
+        <div class="time-bar-wrap">
+          <div class="time-bar-track">
+            <div class="time-bar" data-hours="2h" style="height:0%;background:linear-gradient(180deg,#00BCD4,#0097A7)" data-height="40"></div>
+          </div>
+          <div class="time-day">Tue</div>
+        </div>
+        <div class="time-bar-wrap">
+          <div class="time-bar-track">
+            <div class="time-bar" data-hours="3h" style="height:0%;background:linear-gradient(180deg,#CE93D8,#AB47BC)" data-height="60"></div>
+          </div>
+          <div class="time-day">Wed</div>
+        </div>
+        <div class="time-bar-wrap">
+          <div class="time-bar-track">
+            <div class="time-bar" data-hours="2h" style="height:0%;background:linear-gradient(180deg,#D4AF37,#B59410)" data-height="40"></div>
+          </div>
+          <div class="time-day">Thu</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+window.addEventListener('load', function(){
+
+  const params = new URLSearchParams(window.location.search);
+  const email = params.get('email');
+  const role = params.get('role');
+  if(email){
+    const el = document.getElementById('userEmailText');
+    if(el) el.textContent = decodeURIComponent(email);
+  }
+  if(role){
+    const el = document.getElementById('userRoleText');
+    if(el) el.textContent = decodeURIComponent(role);
+    const sidebarRole = document.querySelector('.user-role');
+    if(sidebarRole) sidebarRole.textContent = decodeURIComponent(role);
+  }
+  if(email){
+    // Update sidebar user card info
+    const nameParts = decodeURIComponent(email).split('@')[0].split(/[._+-]/);
+    const formattedName = nameParts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+    const userNameEl = document.querySelector('.user-name');
+    if (userNameEl) userNameEl.textContent = formattedName;
+    const userAvatarEl = document.querySelector('.user-avatar');
+    if (userAvatarEl) {
+      const initials = nameParts.map(p => p.charAt(0).toUpperCase()).slice(0, 2).join('');
+      if (initials) userAvatarEl.textContent = initials;
+    }
+  }
+
+  // Propagate query parameters to all internal links
+  if (email || role) {
+    document.querySelectorAll('.nav-section a, .sidebar-brand a').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href !== 'index.html' && href !== 'login.html') {
+        const url = new URL(href, window.location.href);
+        if (email) url.searchParams.set('email', email);
+        if (role) url.searchParams.set('role', role);
+        link.href = url.pathname.split('/').pop() + url.search;
+      }
+    });
+  }
+
+  // GSAP entrance animations
+  var items = document.querySelectorAll('.gsap-init');
+  items.forEach(function(el, i){
+    gsap.fromTo(el,
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: i * 0.06 }
+    );
+  });
+
+  // Animate stat numbers
+  document.querySelectorAll('.stat-number').forEach(function(el){
+    var target = parseInt(el.dataset.count);
+    var suffix = el.dataset.suffix || '';
+    gsap.to(el, {
+      textContent: target,
+      duration: 1.5,
+      ease: 'power2.out',
+      delay: 0.5,
+      snap: { textContent: 1 },
+      onUpdate: function(){ el.textContent = Math.round(parseFloat(el.textContent)) + suffix; }
+    });
+  });
+
+  // Animate progress bars (course progress + skill bars)
+  setTimeout(function(){
+    document.querySelectorAll('.course-progress-fill').forEach(function(bar){
+      bar.style.width = bar.dataset.width + '%';
+    });
+    document.querySelectorAll('.skill-fill').forEach(function(bar){
+      bar.style.width = bar.dataset.width + '%';
+    });
+  }, 600);
+
+  // Animate time chart bars
+  setTimeout(function(){
+    document.querySelectorAll('.time-bar').forEach(function(bar){
+      bar.style.height = bar.dataset.height + '%';
+    });
+  }, 800);
+
+  // Animate streak cells (subtle pop-in)
+  document.querySelectorAll('.streak-cell').forEach(function(cell, i){
+    gsap.fromTo(cell,
+      { scale: 0, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.7)', delay: 0.8 + i * 0.025 }
+    );
+  });
+
+});
+</script>
+
+</body>
+</html>

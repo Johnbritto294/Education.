@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile – Stackly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e0e0e0;display:flex;min-height:100vh;overflow-x:hidden;}
+
+    /* ── Sidebar ── */
+    .sidebar{width:260px;min-width:260px;background:#0f0f0f;border-right:1px solid #0F223D;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;padding:24px 16px 16px;}
+    .sidebar-brand{display:flex;align-items:center;gap:12px;padding:0 8px 28px;border-bottom:1px solid #0F223D;margin-bottom:20px;}
+    .sidebar-brand img{height:36px;filter:brightness(0) saturate(100%) invert(82%) sepia(94%) saturate(743%) hue-rotate(10deg) brightness(103%) contrast(101%)}
+    .nav-section{flex:1;overflow-y:auto;}
+    .nav-label{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:#555;padding:4px 12px 8px;font-weight:600;}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;color:#888;text-decoration:none;font-size:14.5px;font-weight:500;transition:all .2s;margin-bottom:2px;}
+    .nav-item svg{width:20px;height:20px;flex-shrink:0;}
+    .nav-item:hover{background:#0F223D;color:#cfcfcf;}
+    .nav-item.active{background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(108,99,255,.08));color:#D4AF37;font-weight:600;box-shadow:0 0 20px rgba(212,175,55,.06);}
+    .sidebar-footer{border-top:1px solid #0F223D;padding-top:16px;margin-top:8px;}
+    .user-card{display:flex;align-items:center;gap:12px;padding:8px;border-radius:12px;margin-bottom:10px;}
+    .user-avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#6C63FF);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#0a0a0a;}
+    .user-info{display:flex;flex-direction:column;}
+    .user-name{font-size:14px;font-weight:600;color:#e0e0e0;}
+    .user-role{font-size:12px;color:#666;}
+    .logout-btn{width:100%;padding:10px;border-radius:10px;border:1px solid #2a2a2a;background:transparent;color:#888;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s;}
+    .logout-btn:hover{border-color:#FF6B6B;color:#FF6B6B;background:rgba(255,107,107,.06);}
+
+    /* ── Main Content ── */
+    .main{margin-left:260px;flex:1;min-height:100vh;}
+
+    /* Banner */
+    .profile-banner{position:relative;height:220px;background:linear-gradient(135deg,#0d2818 0%,#0a1628 35%,#1a0a2e 70%,#2a0a1e 100%);overflow:hidden;}
+    .profile-banner::before{content:'';position:absolute;inset:0;background:
+      radial-gradient(ellipse 600px 300px at 20% 80%,rgba(212,175,55,.15),transparent),
+      radial-gradient(ellipse 500px 250px at 70% 60%,rgba(108,99,255,.12),transparent),
+      radial-gradient(ellipse 400px 200px at 90% 30%,rgba(255,107,107,.08),transparent);}
+    .profile-banner::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,#0a0a0a,transparent);}
+    .banner-grid{position:absolute;inset:0;background-image:
+      linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;}
+
+    /* Profile Header */
+    .profile-header{position:relative;z-index:2;padding:0 48px;margin-top:-90px;}
+    .profile-top{display:flex;align-items:flex-end;gap:28px;margin-bottom:28px;}
+    .avatar-large{width:140px;height:140px;border-radius:28px;background:linear-gradient(135deg,#D4AF37,#6C63FF);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:48px;font-weight:700;color:#0a0a0a;border:4px solid #0a0a0a;box-shadow:0 8px 32px rgba(212,175,55,.2),0 0 0 1px rgba(212,175,55,.15);flex-shrink:0;}
+    .profile-identity{padding-bottom:12px;flex:1;}
+    .profile-name{font-family:'Sora',sans-serif;font-size:32px;font-weight:700;color:#fff;margin-bottom:4px;}
+    .profile-role{font-size:14px;color:#D4AF37;font-weight:600;display:inline-flex;align-items:center;gap:6px;margin-bottom:8px;background:rgba(212,175,55,.1);padding:4px 14px;border-radius:20px;}
+    .profile-meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:6px;}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:13.5px;color:#777;}
+    .meta-item svg{width:15px;height:15px;color:#555;}
+    .edit-btn{padding:12px 28px;border-radius:12px;border:1px solid #2a2a2a;background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(108,99,255,.08));color:#D4AF37;font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:8px;white-space:nowrap;align-self:flex-end;margin-bottom:14px;}
+    .edit-btn:hover{background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(108,99,255,.15));border-color:#D4AF37;box-shadow:0 4px 20px rgba(212,175,55,.15);transform:translateY(-1px);}
+    .edit-btn svg{width:16px;height:16px;}
+
+    /* Stats */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:0 48px;margin-bottom:36px;}
+    .stat-card{background:#0F223D;border:1px solid #2a2a2a;border-radius:16px;padding:24px;text-align:center;transition:all .3s;}
+    .stat-card:hover{border-color:#3a3a3a;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+    .stat-value{font-family:'Sora',sans-serif;font-size:32px;font-weight:700;margin-bottom:4px;}
+    .stat-card:nth-child(1) .stat-value{color:#D4AF37;}
+    .stat-card:nth-child(2) .stat-value{color:#6C63FF;}
+    .stat-card:nth-child(3) .stat-value{color:#FFA726;}
+    .stat-card:nth-child(4) .stat-value{color:#FF6B6B;}
+    .stat-label{font-size:13px;color:#777;font-weight:500;}
+
+    /* Content Grid */
+    .content-area{padding:0 48px 48px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+
+    .section-card{background:#0F223D;border:1px solid #2a2a2a;border-radius:16px;padding:28px;transition:border-color .3s;}
+    .section-card:hover{border-color:#3a3a3a;}
+    .section-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:600;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+    .section-title svg{width:20px;height:20px;color:#D4AF37;}
+    .section-card.full-width{grid-column:1/-1;}
+
+    /* About */
+    .about-text{font-size:14.5px;line-height:1.75;color:#999;}
+    .about-text strong{color:#ccc;}
+
+    /* Skills */
+    .skills-grid{display:flex;flex-wrap:wrap;gap:10px;}
+    .skill-pill{padding:8px 18px;border-radius:24px;font-size:13px;font-weight:500;border:1px solid;transition:all .25s;cursor:default;}
+    .skill-pill:hover{transform:translateY(-2px);}
+    .skill-pill:nth-child(1){background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.25);color:#D4AF37;}
+    .skill-pill:nth-child(2){background:rgba(108,99,255,.08);border-color:rgba(108,99,255,.25);color:#6C63FF;}
+    .skill-pill:nth-child(3){background:rgba(255,167,38,.08);border-color:rgba(255,167,38,.25);color:#FFA726;}
+    .skill-pill:nth-child(4){background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.25);color:#FF6B6B;}
+    .skill-pill:nth-child(5){background:rgba(0,188,212,.08);border-color:rgba(0,188,212,.25);color:#00BCD4;}
+    .skill-pill:nth-child(6){background:rgba(233,30,99,.08);border-color:rgba(233,30,99,.25);color:#E91E63;}
+
+    /* Certificates */
+    .certs-list{display:flex;flex-direction:column;gap:12px;}
+    .cert-card{display:flex;align-items:center;gap:16px;padding:16px 18px;background:#111;border:1px solid #2a2a2a;border-radius:14px;transition:all .3s;}
+    .cert-card:hover{border-color:#FFA726;background:#151510;transform:translateX(4px);}
+    .cert-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(255,167,38,.15),rgba(255,167,38,.05));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .cert-icon svg{width:24px;height:24px;color:#FFA726;}
+    .cert-info{flex:1;}
+    .cert-name{font-size:14.5px;font-weight:600;color:#e0e0e0;margin-bottom:3px;}
+    .cert-date{font-size:12px;color:#666;}
+    .cert-download{width:36px;height:36px;border-radius:10px;border:1px solid #2a2a2a;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#777;transition:all .25s;}
+    .cert-download:hover{border-color:#D4AF37;color:#D4AF37;background:rgba(212,175,55,.06);}
+
+    /* Activity */
+    .activity-list{display:flex;flex-direction:column;gap:14px;}
+    .activity-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#111;border:1px solid #2a2a2a;border-radius:14px;transition:all .3s;}
+    .activity-item:hover{border-color:#6C63FF;background:#110f18;transform:translateX(4px);}
+    .activity-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .activity-dot.green{background:#D4AF37;box-shadow:0 0 8px rgba(212,175,55,.4);}
+    .activity-dot.purple{background:#6C63FF;box-shadow:0 0 8px rgba(108,99,255,.4);}
+    .activity-dot.orange{background:#FFA726;box-shadow:0 0 8px rgba(255,167,38,.4);}
+    .activity-content{flex:1;}
+    .activity-title{font-size:14px;font-weight:500;color:#ccc;margin-bottom:2px;}
+    .activity-sub{font-size:12px;color:#666;}
+    .activity-badge{padding:4px 12px;border-radius:8px;font-size:11px;font-weight:600;}
+    .badge-completed{background:rgba(212,175,55,.1);color:#D4AF37;border:1px solid rgba(212,175,55,.2);}
+    .badge-progress{background:rgba(108,99,255,.1);color:#6C63FF;border:1px solid rgba(108,99,255,.2);}
+    .badge-started{background:rgba(255,167,38,.1);color:#FFA726;border:1px solid rgba(255,167,38,.2);}
+
+    /* ── GSAP init ── */
+    .gsap-init{opacity:0;transform:translateY(24px);}
+  </style>
+</head>
+<body>
+
+<!-- ══════ Sidebar ══════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand"><a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;"><img src="logo.png" alt="Stackly"/><span>Stackly</span></a></div>
+  <nav class="nav-section">
+    <div class="nav-label">Main</div>
+    <a href="dashboard.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Dashboard
+    </a>
+    <a href="my-courses.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      My Courses
+    </a>
+    <a href="schedule.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Schedule
+    </a>
+    <a href="progress.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Progress
+    </a>
+    
+    
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">JS</div>
+      <div class="user-info">
+        <div class="user-name">Jason Student</div>
+        <div class="user-role">Student</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='login.html'">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out
+    </button>
+  </div>
+</aside>
+
+<!-- ══════ Main Content ══════ -->
+<div class="main">
+
+  <div class="topbar gsap-init">
+    <div class="topbar-left">
+      <h1>Profile</h1>
+      <p>Manage your personal information and public profile.</p>
+    </div>
+    <div class="topbar-right">
+      <div class="user-email-display">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="userEmailText">user@example.com</span>
+      </div>
+      <div class="user-role-display">
+        <span id="userRoleText" class="role-badge">Student</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Header -->
+  <div class="profile-header gsap-init">
+    <div class="profile-top">
+      <div class="avatar-large">JS</div>
+      <div class="profile-identity">
+        <h1 class="profile-name" id="profileName">Jason Student</h1>
+        <div class="profile-role" id="profileRole">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/></svg>
+          <span id="profileRoleText">Student</span>
+        </div>
+        <div class="profile-meta">
+          <span class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Member since Jan 2025
+          </span>
+          <span class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Salem, Tamil Nadu, India
+          </span>
+          <span class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            jason.student@stackly.io
+          </span>
+        </div>
+      </div>
+      <button class="edit-btn" onclick="alert('Edit Profile feature coming soon!')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card gsap-init">
+      <div class="stat-value">12</div>
+      <div class="stat-label">Courses Enrolled</div>
+    </div>
+    <div class="stat-card gsap-init">
+      <div class="stat-value">7</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card gsap-init">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Certificates</div>
+    </div>
+    <div class="stat-card gsap-init">
+      <div class="stat-value">2,120</div>
+      <div class="stat-label">Points Earned</div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-area">
+
+    <!-- About Me -->
+    <div class="section-card gsap-init">
+      <h2 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        About Me
+      </h2>
+      <p class="about-text">
+        Hi! I'm <strong>Jason</strong>, a passionate learner exploring the intersection of <strong>web development</strong> and <strong>machine learning</strong>. Currently focused on building full-stack applications with the MERN stack while diving deep into Python-based ML frameworks.
+        <br/><br/>
+        I believe in learning by building — every course I take ends with a real-world project. My goal is to become a <strong>full-stack AI engineer</strong> who can design intelligent, user-friendly products. When I'm not coding, you'll find me exploring UI/UX design patterns or reading about digital marketing strategies.
+      </p>
+    </div>
+
+    <!-- Skills & Interests -->
+    <div class="section-card gsap-init">
+      <h2 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Skills &amp; Interests
+      </h2>
+      <div class="skills-grid">
+        <span class="skill-pill">JavaScript</span>
+        <span class="skill-pill">React</span>
+        <span class="skill-pill">Python</span>
+        <span class="skill-pill">Machine Learning</span>
+        <span class="skill-pill">UI/UX Design</span>
+        <span class="skill-pill">Marketing</span>
+      </div>
+    </div>
+
+    <!-- Certificates -->
+    <div class="section-card gsap-init">
+      <h2 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 8h.01"/><path d="M17 8h.01"/><path d="M12 8h.01"/></svg>
+        Certificates
+      </h2>
+      <div class="certs-list">
+        <div class="cert-card">
+          <div class="cert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="cert-info">
+            <div class="cert-name">MERN Stack Mastery</div>
+            <div class="cert-date">Earned on Mar 15, 2025</div>
+          </div>
+          <button class="cert-download" title="Download Certificate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="cert-info">
+            <div class="cert-name">Machine Learning Fundamentals</div>
+            <div class="cert-date">Earned on Feb 22, 2025</div>
+          </div>
+          <button class="cert-download" title="Download Certificate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="cert-info">
+            <div class="cert-name">Adobe Photoshop Pro</div>
+            <div class="cert-date">Earned on Jan 30, 2025</div>
+          </div>
+          <button class="cert-download" title="Download Certificate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="cert-info">
+            <div class="cert-name">Digital Marketing Essentials</div>
+            <div class="cert-date">Earned on Jan 10, 2025</div>
+          </div>
+          <button class="cert-download" title="Download Certificate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="cert-info">
+            <div class="cert-name">Financial Analysis &amp; Modeling</div>
+            <div class="cert-date">Earned on Apr 5, 2025</div>
+          </div>
+          <button class="cert-download" title="Download Certificate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning Activity -->
+    <div class="section-card gsap-init">
+      <h2 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Learning Activity
+      </h2>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-dot green"></div>
+          <div class="activity-content">
+            <div class="activity-title">MERN Stack Mastery</div>
+            <div class="activity-sub">Completed all 48 lessons · Mar 15, 2025</div>
+          </div>
+          <span class="activity-badge badge-completed">Completed</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot green"></div>
+          <div class="activity-content">
+            <div class="activity-title">Machine Learning Fundamentals</div>
+            <div class="activity-sub">Completed all 36 lessons · Feb 22, 2025</div>
+          </div>
+          <span class="activity-badge badge-completed">Completed</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot purple"></div>
+          <div class="activity-content">
+            <div class="activity-title">Operations Management</div>
+            <div class="activity-sub">Lesson 18 of 30 · In progress</div>
+          </div>
+          <span class="activity-badge badge-progress">In Progress</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot green"></div>
+          <div class="activity-content">
+            <div class="activity-title">Adobe Photoshop Pro</div>
+            <div class="activity-sub">Completed all 28 lessons · Jan 30, 2025</div>
+          </div>
+          <span class="activity-badge badge-completed">Completed</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot orange"></div>
+          <div class="activity-content">
+            <div class="activity-title">Financial Analysis &amp; Modeling</div>
+            <div class="activity-sub">Lesson 8 of 32 · Just started</div>
+          </div>
+          <span class="activity-badge badge-started">Started</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot green"></div>
+          <div class="activity-content">
+            <div class="activity-title">Digital Marketing Essentials</div>
+            <div class="activity-sub">Completed all 24 lessons · Jan 10, 2025</div>
+          </div>
+          <span class="activity-badge badge-completed">Completed</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /main -->
+
+<script>
+  window.addEventListener('load', function(){
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+    const role = params.get('role');
+    
+    if (email) {
+      const emailText = document.getElementById('userEmailText');
+      if (emailText) {
+        emailText.textContent = decodeURIComponent(email);
+        emailText.title = decodeURIComponent(email);
+      }
+      
+      // Update sidebar user card info
+      const nameParts = decodeURIComponent(email).split('@')[0].split(/[._+-]/);
+      const formattedName = nameParts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      const userNameEl = document.querySelector('.user-name');
+      if (userNameEl) {
+        userNameEl.textContent = formattedName;
+      }
+      const userAvatarEl = document.querySelector('.user-avatar');
+      if (userAvatarEl) {
+        const initials = nameParts.map(p => p.charAt(0).toUpperCase()).slice(0, 2).join('');
+        if (initials) userAvatarEl.textContent = initials;
+      }
+    }
+    if (role) {
+      const roleText = document.getElementById('userRoleText');
+      if (roleText) {
+        roleText.textContent = decodeURIComponent(role);
+      }
+      const sidebarRole = document.querySelector('.user-role');
+      if (sidebarRole) {
+        sidebarRole.textContent = decodeURIComponent(role);
+      }
+    }
+
+    if (email || role) {
+      document.querySelectorAll('.nav-section a, .sidebar-brand a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href !== 'index.html' && href !== 'login.html') {
+          const url = new URL(href, window.location.href);
+          if (email) url.searchParams.set('email', email);
+          if (role) url.searchParams.set('role', role);
+          link.href = url.pathname.split('/').pop() + url.search;
+        }
+      });
+    }
+  });
+
+  // GSAP entrance animations
+  gsap.set('.gsap-init',{opacity:0,y:24});
+  gsap.to('.profile-header',{opacity:1,y:0,duration:.7,ease:'power3.out',delay:.15});
+  gsap.to('.stat-card',{opacity:1,y:0,duration:.55,ease:'power3.out',stagger:.1,delay:.35});
+  gsap.to('.section-card',{opacity:1,y:0,duration:.6,ease:'power3.out',stagger:.12,delay:.55});
+</script>
+</body>
+</html>
